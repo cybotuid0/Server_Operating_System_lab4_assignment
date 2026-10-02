@@ -34,12 +34,46 @@
 
 ## TASK 2
 
+Predictions (recorded before running): GET = 200  POST = 200  PUT = 403  DELETE = 403
 
+Observed:
+```
+HTTP/1.1 200 OK                     (GET)
+HTTP/1.1 200 OK                     (POST)
+HTTP/1.1 405 Method Not Allowed     (PUT)
+HTTP/1.1 405 Method Not Allowed     (DELETE)
+```
 
+Full DELETE response headers (`curl -s -i -X DELETE ... | head -8`):
+```
+HTTP/1.1 405 Method Not Allowed
+Date: Thu, 01 Oct 2026 13:06:48 GMT
+Server: Apache
+Allow: GET,POST,OPTIONS,HEAD
+Content-Length: 223
+Content-Type: text/html; charset=iso-8859-1
+```
 
 ### Task 2 answers:
+- GET and POST predictions were correct. PUT and DELETE were predicted as
+  403 but returned 405.
+- Why 405 and not 403: 403 means "you are not permitted to access this
+  resource". 405 means the resource exists, but this method is not
+  supported on it. The server is not refusing us personally; it simply has
+  no way to perform PUT or DELETE on a static file.
+- 404 vs 405: 404 means the server cannot find the resource. index.html
+  exists, so 404 would be wrong. 405 means "found it, but not like that".
+- The Allow header (GET,POST,OPTIONS,HEAD) explains the results: GET and
+  POST are in the list, so both returned 200; PUT and DELETE are not, so
+  both returned 405.
+- POST returned 200 because Apache's static file handler treats POST like
+  GET: it sent back index.html and ignored the body. No program on the
+  server read name=student&id=123.
+- The "Server: Apache" header shows no version number, confirming the
+  ServerTokens Prod hardening from Step 4.
 
 ---
+
 
 ## TASK 3
 
