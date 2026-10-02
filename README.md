@@ -106,7 +106,44 @@ Content-Type: text/html; charset=iso-8859-1
 ## TASK 3
 
 
+## TASK 3
+
+GET with query string:
+```
+Method received: GET
+Query string: course=192-442&week=4
+```
+
+POST with body:
+```
+Method received: POST
+Query string: 
+POST body: name=student&id=123
+```
+
+Access log (grep cgi-bin):
+```
+::1 - - [01/Oct/2026:13:09:50 +0000] "GET /cgi-bin/echo.sh?course=192-442&week=4 HTTP/1.1" 200 175 "-" "curl/8.5.0"
+::1 - - [01/Oct/2026:13:10:01 +0000] "POST /cgi-bin/echo.sh HTTP/1.1" 200 186 "-" "curl/8.5.0"
+```
+(2 log lines, not 4, because only 2 CGI requests were sent.)
+
 ### Task 3 answers:
+- GET carried its data in the URL query string (course=192-442&week=4), after the "?".
+- POST carried its data in the request body (name=student&id=123), which
+  the CGI script read from standard input.
+- The access log shows the full GET URL including the query string in
+  plain text, but the POST line shows only /cgi-bin/echo.sh, without the
+  body.
+- Why it matters: anything sent by GET is stored wherever the URL is
+  recorded. A password sent by GET would end up in several places, for
+  example the web server access log and the browser history (also
+  bookmarks, the address bar and proxy logs). That is why login forms use
+  POST. POST still needs HTTPS, because the body is not encrypted over
+  plain HTTP.
+- Unlike Task 2, a program (echo.sh) actually read the POST data this time.
+
+---
 
 ---
 
