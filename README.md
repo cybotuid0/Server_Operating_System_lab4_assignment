@@ -26,9 +26,30 @@
 
 ## TASK 1c
 
+**Log lines (`tail -3 /var/log/apache2/access.log`)**
+
+Line 1: browser asking for the site icon
+```
 10.244.5.148 - - [02/Oct/2026:15:20:01 +0000] "GET /favicon.ico HTTP/1.1" 404 436 "https://acb1f908ced291a6-1-80.papa.r.killercoda.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0"
+```
+
+Line 2: browser asking for the page
+```
 10.244.5.148 - - [02/Oct/2026:15:20:03 +0000] "GET / HTTP/1.1" 200 701 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0"
+```
+
+Line 3: curl asking for the page
+```
 ::1 - - [02/Oct/2026:15:20:22 +0000] "GET / HTTP/1.1" 200 818 "-" "curl/8.5.0"
+```
+
+**Summary**
+
+| Client | Request | Status | Referer | User-Agent |
+|---|---|---|---|---|
+| Browser (Edge) | GET /favicon.ico | 404 | Killercoda page URL | Mozilla/5.0 ... Edg/154.0.0.0 |
+| Browser (Edge) | GET / | 200 | - | Mozilla/5.0 ... Edg/154.0.0.0 |
+| curl | GET / | 200 | - | curl/8.5.0 |
 
 
 ### Task 1c answers:
