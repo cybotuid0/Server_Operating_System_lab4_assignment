@@ -30,6 +30,7 @@
 10.244.5.148 - - [02/Oct/2026:15:20:03 +0000] "GET / HTTP/1.1" 200 701 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0"
 ::1 - - [02/Oct/2026:15:20:22 +0000] "GET / HTTP/1.1" 200 818 "-" "curl/8.5.0"
 
+
 ### Task 1c answers:
 
 - Browser vs curl: the browser's User-Agent is a long Mozilla/5.0 string naming the OS and rendering engine, while curl's is only curl/8.5.0.
