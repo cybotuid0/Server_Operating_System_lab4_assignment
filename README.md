@@ -17,46 +17,51 @@
 
 ## TASK 1
 
+Status code count (`awk '{print $9}' access.log | sort | uniq -c | sort -rn`):
 
+```
+     15 200
+      4 404
+```
 
 ### Task 1 answers:
-
+- 200s: 15, 404s: 4.
+- Three of the 404s are the deliberate requests for missing-page.html in the
+  loop. The fourth comes from another request for a file that does not
+  exist (an earlier test request "curl -s http://localhost/nonexistent > /dev/null").
+- Why site1/site2 are missing: each virtual host has its own CustomLog
+  directive in site1.conf and site2.conf, so the requests sent with
+  Host: site1.lab.local and Host: site2.lab.local were written to
+  site1-access.log and site2-access.log, not to the main access.log that
+  was counted.
 
 ---
 
 ## TASK 1c
 
-**Log lines (`tail -3 /var/log/apache2/access.log`)**
-
-Line 1: browser asking for the site icon
 ```
-10.244.5.148 - - [02/Oct/2026:15:20:01 +0000] "GET /favicon.ico HTTP/1.1" 404 436 "https://acb1f908ced291a6-1-80.papa.r.killercoda.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0"
+::1 - - [01/Oct/2026:12:57:48 +0000] "GET / HTTP/1.1" 200 930 "-" "curl/8.5.0"
+10.244.9.205 - - [01/Oct/2026:13:00:32 +0000] "GET / HTTP/1.1" 200 628 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+10.244.9.205 - - [01/Oct/2026:13:00:32 +0000] "GET /favicon.ico HTTP/1.1" 404 341 "https://d9fd48b25b6d0e53-1-80.spca.r.killercoda.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
 ```
-
-Line 2: browser asking for the page
-```
-10.244.5.148 - - [02/Oct/2026:15:20:03 +0000] "GET / HTTP/1.1" 200 701 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0"
-```
-
-Line 3: curl asking for the page
-```
-::1 - - [02/Oct/2026:15:20:22 +0000] "GET / HTTP/1.1" 200 818 "-" "curl/8.5.0"
-```
-
-**Summary**
-
-| Client | Request | Status | Referer | User-Agent |
-|---|---|---|---|---|
-| Browser (Edge) | GET /favicon.ico | 404 | Killercoda page URL | Mozilla/5.0 ... Edg/154.0.0.0 |
-| Browser (Edge) | GET / | 200 | - | Mozilla/5.0 ... Edg/154.0.0.0 |
-| curl | GET / | 200 | - | curl/8.5.0 |
-
 
 ### Task 1c answers:
-
-- Browser vs curl: the browser's User-Agent is a long Mozilla/5.0 string naming the OS and rendering engine, while curl's is only curl/8.5.0.
-- Referer: the favicon request shows the Killercoda page URL as its Referer, because the browser asked for the icon while viewing that page. The page request and the curl request show "-", meaning they were typed or opened directly and not clicked from another page.
-- Why admins care: the User-Agent shows what kind of client is making requests, so an admin can spot bots, scripts or unusual traffic.
+- Line 1 is curl: User-Agent "curl/8.5.0", from ::1 (IPv6 localhost),
+  because curl ran on the server itself.
+- Lines 2-3 are the browser: User-Agent "Mozilla/5.0 (Windows NT 10.0;
+  Win64; x64) ... Chrome/154.0.0.0", i.e. Google Chrome on 64-bit Windows,
+  from 10.244.9.205, which is the Killercoda proxy that forwards browser
+  traffic to port 80.
+- The browser made 2 requests for one visit: the page and an automatic
+  /favicon.ico (404, because the site has no icon). The favicon request
+  also has a Referer (the Killercoda URL), showing which page caused it.
+  curl made exactly 1 request.
+- The browser received a smaller response (628 vs 930 bytes) because it
+  accepts gzip compression, while curl did not ask for it.
+- Why an administrator cares about the User-Agent: it shows what software
+  sent each request, which helps separate real visitors from bots and
+  attack tools and troubleshoot browser-specific problems, although it can
+  be faked because the client sets it.
 
 ---
 
@@ -102,10 +107,6 @@ Content-Type: text/html; charset=iso-8859-1
 
 ---
 
-
-## TASK 3
-
-
 ## TASK 3
 
 GET with query string:
@@ -142,8 +143,6 @@ Access log (grep cgi-bin):
   POST. POST still needs HTTPS, because the body is not encrypted over
   plain HTTP.
 - Unlike Task 2, a program (echo.sh) actually read the POST data this time.
-
----
 
 ---
 
